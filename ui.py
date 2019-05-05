@@ -8,13 +8,20 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")# 让Windows知道这是一个单独的窗口
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(392, 594)
         MainWindow.setFixedSize(392, 594)
+        self.setWindowOpacity(0.9) # 设置窗口透明度
+        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # 设置窗口背景透明
+        # self.setWindowFlag(QtCore.Qt.FramelessWindowHint) # 隐藏边框
+        self.setGeometry(300, 300, 300, 220)
+        self.setWindowTitle('图标')
+        self.setWindowIcon(QtGui.QIcon('src\交流.png')) 
 # 上方三个按钮
         self.pushButton_search = QtWidgets.QPushButton(MainWindow)
         self.pushButton_search.setGeometry(QtCore.QRect(270, 0, 41, 41))
@@ -48,7 +55,7 @@ class Ui_MainWindow(object):
         self.pushButton_list.setAutoExclusive(True)
         self.pushButton_list.setStyleSheet('''QPushButton{background: #3C79F2; border-color: #11505C; font-weight: bold; font-family:"Microsoft YaHei"; }''')
         self.app_name = QtWidgets.QLabel(MainWindow)
-        self.app_name.setGeometry(QtCore.QRect(0, 0, 71, 41))
+        self.app_name.setGeometry(QtCore.QRect(0, 0, 250, 41))
         self.app_name.setObjectName("app_name")
         self.stackedWidget = QtWidgets.QStackedWidget(MainWindow)
         self.stackedWidget.setGeometry(QtCore.QRect(0, 70, 391, 521))
@@ -106,13 +113,11 @@ class Ui_MainWindow(object):
         self.pushButton_P_send = QtWidgets.QPushButton(self.page_chat)
         self.pushButton_P_send.setGeometry(QtCore.QRect(310, 480, 41, 41))
         self.pushButton_P_send.setObjectName("pushButton_P_send")
-        self.pushButton_P_send.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_P_send.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.pushButton_P_imgandfile = QtWidgets.QPushButton(self.page_chat)
         self.pushButton_P_imgandfile.setGeometry(QtCore.QRect(350, 480, 41, 41))
         self.pushButton_P_imgandfile.setObjectName("pushButton_P_imgandfile")
-        self.pushButton_P_imgandfile.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_P_imgandfile.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.textEdit_P = QtWidgets.QTextEdit(self.page_chat)
         self.textEdit_P.setGeometry(QtCore.QRect(0, 0, 391, 481))
         self.textEdit_P.setObjectName("textEdit_P")
@@ -123,7 +128,7 @@ class Ui_MainWindow(object):
         self.stackedWidget_2 = QtWidgets.QStackedWidget(MainWindow)
         self.stackedWidget_2.setGeometry(QtCore.QRect(60, 100, 281, 411))
         self.stackedWidget_2.setObjectName("stackedWidget_2")
-        self.stackedWidget_2.setStyleSheet('''QStackedWidget{background:blue; border:2px solid blue;border-radius:8px;}''')
+        self.stackedWidget_2.setStyleSheet('''QStackedWidget{background:#3C79F2; border:2px solid blue;border-radius:8px;}''')
         self.page_addFriends = QtWidgets.QWidget()
         self.page_addFriends.setObjectName("page_addFriends")
         self.widget = QtWidgets.QWidget(self.page_addFriends)
@@ -136,9 +141,11 @@ class Ui_MainWindow(object):
         self.pushButton_addFriends = QtWidgets.QPushButton(self.widget)
         self.pushButton_addFriends.setGeometry(QtCore.QRect(160, 40, 41, 21))
         self.pushButton_addFriends.setObjectName("pushButton_addFriends")
+        self.pushButton_addFriends.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.pushButton_refresh = QtWidgets.QPushButton(self.widget)
         self.pushButton_refresh.setGeometry(QtCore.QRect(210, 40, 41, 21))
         self.pushButton_refresh.setObjectName("pushButton_refresh")
+        self.pushButton_refresh.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.tableWidget_person = QtWidgets.QTableWidget(self.widget)
         self.tableWidget_person.setGeometry(QtCore.QRect(0, 70, 281, 341))
         self.tableWidget_person.setObjectName("tableWidget_person")
@@ -152,8 +159,10 @@ class Ui_MainWindow(object):
         self.label_addFriends.setGeometry(QtCore.QRect(30, 20, 81, 21))
         self.label_addFriends.setObjectName("label_addFriends")
         self.pushButton_addFriends_q = QtWidgets.QPushButton(self.widget)
-        self.pushButton_addFriends_q.setGeometry(QtCore.QRect(234, 0, 51, 23))
+        self.pushButton_addFriends_q.setGeometry(QtCore.QRect(260, 0, 51, 23))
+        self.pushButton_addFriends_q.setFixedSize(15,15) # 设置关闭按钮的大小
         self.pushButton_addFriends_q.setObjectName("pushButton_addFriends_q")
+        self.pushButton_addFriends_q.setStyleSheet('''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
         self.stackedWidget_2.addWidget(self.page_addFriends)
 # 上方添加群组界面
         self.page_addGroup = QtWidgets.QWidget()
@@ -164,9 +173,11 @@ class Ui_MainWindow(object):
         self.pushButton_joinGroup = QtWidgets.QPushButton(self.widget_GroupChat)
         self.pushButton_joinGroup.setGeometry(QtCore.QRect(170, 20, 61, 21))
         self.pushButton_joinGroup.setObjectName("pushButton_joinGroup")
+        self.pushButton_joinGroup.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.pushButton_creatGroup = QtWidgets.QPushButton(self.widget_GroupChat)
         self.pushButton_creatGroup.setGeometry(QtCore.QRect(170, 50, 61, 21))
         self.pushButton_creatGroup.setObjectName("pushButton_creatGroup")
+        self.pushButton_creatGroup.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.lineEdit_group = QtWidgets.QLineEdit(self.widget_GroupChat)
         self.lineEdit_group.setGeometry(QtCore.QRect(20, 30, 131, 31))
         self.lineEdit_group.setObjectName("lineEdit_group")
@@ -175,8 +186,10 @@ class Ui_MainWindow(object):
         self.label_group.setGeometry(QtCore.QRect(20, 10, 51, 21))
         self.label_group.setObjectName("label_group")
         self.pushButton_addGroup_q = QtWidgets.QPushButton(self.widget_GroupChat)
-        self.pushButton_addGroup_q.setGeometry(QtCore.QRect(240, 0, 41, 23))
+        self.pushButton_addGroup_q.setGeometry(QtCore.QRect(260, 0, 41, 23))
         self.pushButton_addGroup_q.setObjectName("pushButton_addGroup_q")
+        self.pushButton_addGroup_q.setFixedSize(15,15) # 设置关闭按钮的大小
+        self.pushButton_addGroup_q.setStyleSheet('''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
         self.tableWidget_group = QtWidgets.QTableWidget(self.widget_GroupChat)
         self.tableWidget_group.setGeometry(QtCore.QRect(0, 80, 281, 331))
         self.tableWidget_group.setObjectName("tableWidget_group")
@@ -219,13 +232,11 @@ class Ui_MainWindow(object):
         self.pushButton_M_send = QtWidgets.QPushButton(self.page_mchat)
         self.pushButton_M_send.setGeometry(QtCore.QRect(310, 480, 41, 41))
         self.pushButton_M_send.setObjectName("pushButton_M_send")
-        self.pushButton_M_send.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_M_send.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.pushButton_M_imgandfile = QtWidgets.QPushButton(self.page_mchat)
         self.pushButton_M_imgandfile.setGeometry(QtCore.QRect(350, 480, 41, 41))
         self.pushButton_M_imgandfile.setObjectName("pushButton_M_imgandfile")
-        self.pushButton_M_imgandfile.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_M_imgandfile.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.textEdit_M = QtWidgets.QTextEdit(self.page_mchat)
         self.textEdit_M.setGeometry(QtCore.QRect(0, 0, 391, 481))
         self.textEdit_M.setObjectName("textEdit_M")
@@ -283,6 +294,7 @@ class Ui_MainWindow(object):
                 border-radius:10px;
                 padding:2px 4px;
         }''')    
+        self.lineEdit_password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.label_password = QtWidgets.QLabel(self.scrollAreaWidgetContents)
         self.label_password.setGeometry(QtCore.QRect(90, 390, 31, 21))
         self.label_password.setObjectName("label_password")
@@ -290,13 +302,11 @@ class Ui_MainWindow(object):
         self.pushButton_login = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_login.setGeometry(QtCore.QRect(130, 430, 51, 23))
         self.pushButton_login.setObjectName("pushButton_login")
-        self.pushButton_login.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_login.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.pushButton_register = QtWidgets.QPushButton(self.scrollAreaWidgetContents)
         self.pushButton_register.setGeometry(QtCore.QRect(220, 430, 51, 23))
         self.pushButton_register.setObjectName("pushButton_register")
-        self.pushButton_register.setStyleSheet('''QPushButton{border:none;color:gray;font-size:12px;height:40px;padding-left:5px;padding-right:10px;background:#6DDF6D;}
-                                            QPushButton:hover{color:black;border:1px solid #F3F3F5;border-radius:10px;background:green;}''')
+        self.pushButton_register.setStyleSheet('''QPushButton{background:#6DDF6D;}QPushButton:hover{background:green;}''')
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.retranslateUi(MainWindow)
@@ -334,14 +344,14 @@ class Ui_MainWindow(object):
         
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "TinyChat"))
         self.pushButton_search.setText(_translate("MainWindow", "搜索"))
         self.pushButton_insert.setText(_translate("MainWindow", "添加"))
         self.pushButton_others.setText(_translate("MainWindow", "其他"))
         self.pushButton_chat.setText(_translate("MainWindow", "聊天"))
         self.pushButton_mchat.setText(_translate("MainWindow", "群聊"))
         self.pushButton_list.setText(_translate("MainWindow", "通讯录"))
-        self.app_name.setText(_translate("MainWindow", "tinychat"))
+        # self.app_name.setText(_translate("MainWindow", "love you three thousands"))
         self.pushButton_P_send.setText(_translate("MainWindow", "发送"))
         self.pushButton_P_imgandfile.setText(_translate("MainWindow", "+"))
         self.pushButton_M_send.setText(_translate("MainWindow", "发送"))
@@ -351,10 +361,10 @@ class Ui_MainWindow(object):
         self.pushButton_login.setText(_translate("MainWindow", "登录"))
         self.pushButton_register.setText(_translate("MainWindow", "注册"))
         self.pushButton_addFriends.setText(_translate("MainWindow","添加"))
-        self.pushButton_addFriends_q.setText(_translate("MainWindow","关闭"))
+        # self.pushButton_addFriends_q.setText(_translate("MainWindow","关闭"))
         self.label_addFriends.setText(_translate("MainWindow","请输入用户名"))
         self.pushButton_creatGroup.setText(_translate("MainWindow","创建群聊"))
         self.pushButton_joinGroup.setText(_translate("MainWindow","加入群聊"))
-        self.pushButton_addGroup_q.setText(_translate("MainWindow","关闭"))
+        # self.pushButton_addGroup_q.setText(_translate("MainWindow","关闭"))
         self.label_group.setText(_translate("MainWindow","群聊名称"))
         self.pushButton_refresh.setText(_translate("MainWindow", "刷新"))
