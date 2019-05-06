@@ -18,7 +18,7 @@ Account = None # 全局变量
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None):# 按钮触发
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.pushButton_login.clicked.connect(self.start_login)# 登录
@@ -74,39 +74,52 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         message = self.lineEdit_P_message.text()
         target = self.lineEdit_P_target.text()
         if message and target:
-            if '/' in message:
-                # 为图片文件
-                self.lineEdit_P_message.clear()
-                self.lineEdit_P_target.clear()
-                filename = os.path.basename(message)# 图片名
-                # 发送信息
-                file_size = os.stat(message).st_size# 图片尺寸
-                file_info = {'type': 'P2P', 'to':target, 'filename': filename, 'filesize':file_size, 'from':Account}
-                print(file_info)
-                sock.send((json.dumps(file_info)).encode('utf-8'))
-                # 发送内容
-                f = open(message, 'rb')
-                has_sent = 0
-                while has_sent != file_size:
-                    data = f.read(1024)
-                    sock.sendall(data)
-                    has_sent += len(data)
-                print('发送成功')
-                self.slotAbout('图片发送成功')
-                f.close()
-
+            if target == Account:
+                self.slotAbout('不能发给自己')
             else:
-                # 消息发送
-                self.lineEdit_P_message.clear()
-                self.lineEdit_P_target.clear()
-                data = {'type': 'P2P', 'to': target, 'message': message, 'from': Account}
-                sock.send((json.dumps(data)).encode('utf-8'))
-                self.textEdit_P.setTextColor(QtCore.Qt.blue)
-                self.textEdit_P.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
-                self.textEdit_P.append('[%s]' % ctime())
-                self.textEdit_P.setTextColor(QtCore.Qt.black)
-                self.textEdit_P.setCurrentFont(QtGui.QFont("微软雅黑", 20, QtGui.QFont.Bold))# 设置字体
-                self.textEdit_P.append('%s: %s' % (Account, message))
+                if '/' in message:
+                    # 为图片文件
+                    self.lineEdit_P_message.clear()
+                    self.lineEdit_P_target.clear()
+                    filename = os.path.basename(message)# 图片名
+                    # 发送信息
+                    file_size = os.stat(message).st_size# 图片尺寸
+                    file_info = {'type': 'P2P', 'to':target, 'filename': filename, 'filesize':file_size, 'from':Account}
+                    print(file_info)
+                    sock.send((json.dumps(file_info)).encode('utf-8'))
+                    # 发送内容
+                    f = open(message, 'rb')
+                    has_sent = 0
+                    while has_sent != file_size:
+                        data = f.read(1024)
+                        sock.sendall(data)
+                        has_sent += len(data)
+                    print('发送成功')
+                    self.slotAbout('图片发送成功')
+                    f.close()
+                    self.textEdit_P.setTextColor(QtCore.Qt.blue)
+                    self.textEdit_P.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
+                    self.textEdit_P.append('[%s]' % ctime())
+                    self.textEdit_P.setAlignment(QtCore.Qt.AlignRight)
+                    self.textEdit_P.setTextColor(QtCore.Qt.black)
+                    self.textEdit_P.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
+                    self.textEdit_P.append('%s->%s:(文件) %s' % (Account, target, filename))
+                    self.textEdit_P.setAlignment(QtCore.Qt.AlignRight)
+
+                else:
+                    # 消息发送
+                    self.lineEdit_P_message.clear()
+                    self.lineEdit_P_target.clear()
+                    data = {'type': 'P2P', 'to': target, 'message': message, 'from': Account}
+                    sock.send((json.dumps(data)).encode('utf-8'))
+                    self.textEdit_P.setTextColor(QtCore.Qt.blue)
+                    self.textEdit_P.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
+                    self.textEdit_P.append('[%s]' % ctime())
+                    self.textEdit_P.setAlignment(QtCore.Qt.AlignRight)
+                    self.textEdit_P.setTextColor(QtCore.Qt.black)
+                    self.textEdit_P.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
+                    self.textEdit_P.append('%s->%s: %s' % (Account, target, message))
+                    self.textEdit_P.setAlignment(QtCore.Qt.AlignRight)
         else:
             self.slotAbout('请填写完整你的信息')
 
@@ -134,6 +147,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print('发送成功')
                 self.slotAbout('图片发送成功')
                 f.close()
+                self.textEdit_M.setTextColor(QtCore.Qt.blue)
+                self.textEdit_M.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
+                self.textEdit_M.append('[%s]' % ctime())
+                self.textEdit_M.setAlignment(QtCore.Qt.AlignRight)
+                self.textEdit_M.setTextColor(QtCore.Qt.black)
+                self.textEdit_M.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
+                self.textEdit_M.append('%s->%s(群聊):(文件) %s' % (Account, target, filename))
+                self.textEdit_M.setAlignment(QtCore.Qt.AlignRight)
             else:
                 self.lineEdit_M_message.clear()
                 self.lineEdit_M_target.clear()
@@ -142,12 +163,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.textEdit_M.setTextColor(QtCore.Qt.blue)
                 self.textEdit_M.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
                 self.textEdit_M.append('[%s]' % ctime())
+                self.textEdit_M.setAlignment(QtCore.Qt.AlignRight)
                 self.textEdit_M.setTextColor(QtCore.Qt.black)
-                self.textEdit_M.setCurrentFont(QtGui.QFont("微软雅黑", 20, QtGui.QFont.Bold))# 设置字体
-                self.textEdit_M.append('%s: %s' % (Account, message))
+                self.textEdit_M.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
+                self.textEdit_M.append('%s->%s(群聊): %s' % (Account, target, message))
+                self.textEdit_M.setAlignment(QtCore.Qt.AlignRight)
         else:
             self.slotAbout('请填写完整你的信息')
-
 
     def start_login(self):# 登录
         global Account
@@ -169,13 +191,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.cRun(account)
             elif data == 'failed_online':
                 print('failed to login,account was online')
-                self.slotAbout('failed to login,account was online')
+                self.slotAbout('登录失败，账号已在线')
             elif data == 'failed_wrong':
                 print('failed to login,password is wrong')
-                self.slotAbout('failed to login,password is wrong')
+                self.slotAbout('登录失败，密码错误')
             else:
                 print('the account is not registered')
-                self.slotAbout('the account is not registered')
+                self.slotAbout('账号未注册')
 
     def start_register(self):# 注册
         global Account
@@ -197,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.cRun(account)
             elif data == 'failed':
                 print ('register Failed,account existed!')
-                self.slotAbout('register Failed,account existed!')
+                self.slotAbout('注册失败，账号已存在!')
 
     def creat_group(self):# 创建群组
         group_name = self.lineEdit_group.text()
@@ -231,6 +253,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.threadIn.sinIn_text.connect(self.update_text_p)
         self.threadIn.sinIn_person.connect(self.update_text_person)
         self.threadIn.sinIn_group.connect(self.update_text_group)
+        self.threadIn.sinIn_updategroup.connect(self.update_text_group1)
         self.threadIn.exception.connect(self.slotAbout)
         self.threadIn.exception1.connect(self.slotAbout1)
         self.threadIn.start()
@@ -276,18 +299,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.textEdit_M.setTextColor(QtCore.Qt.blue)
         self.textEdit_M.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
         self.textEdit_M.append('[%s]' % ctime())
+        self.textEdit_M.setAlignment(QtCore.Qt.AlignLeft)
         self.textEdit_M.setTextColor(QtCore.Qt.black)
-        self.textEdit_M.setCurrentFont(QtGui.QFont("微软雅黑", 20, QtGui.QFont.Bold))# 设置字体
+        self.textEdit_M.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
         self.textEdit_M.append('%s' % (inString))
+        self.textEdit_M.setAlignment(QtCore.Qt.AlignLeft)
         self.label_newm_2.show()
 
     def update_text_p(self, inString):# 更新单人聊天
         self.textEdit_P.setTextColor(QtCore.Qt.blue)
         self.textEdit_P.setCurrentFont(QtGui.QFont("Times New Roman", 10, QtGui.QFont.Bold))# 设置字体
         self.textEdit_P.append('[%s]' % ctime())
+        self.textEdit_P.setAlignment(QtCore.Qt.AlignLeft)
         self.textEdit_P.setTextColor(QtCore.Qt.black)
-        self.textEdit_P.setCurrentFont(QtGui.QFont("微软雅黑", 20, QtGui.QFont.Bold))# 设置字体
+        self.textEdit_P.setCurrentFont(QtGui.QFont("微软雅黑", 16, QtGui.QFont.Bold))# 设置字体
         self.textEdit_P.append('%s' % (inString))
+        self.textEdit_P.setAlignment(QtCore.Qt.AlignLeft)
         self.label_newm_1.show()
 
     def update_text_person(self, inList):# 更新局域网好友列表
@@ -308,7 +335,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 # 按账户名首字母排序
                 self.tableWidget_person.sortItems(0, QtCore.Qt.AscendingOrder)
 
-    def update_text_group(self, groupname, owner):# 更新群组列表
+    def update_text_group(self, groupname, owner):# 建群后更新群组列表
         RowCount = self.tableWidget_group.rowCount()
         self.tableWidget_group.insertRow(RowCount)
         newItem1 = QtWidgets.QTableWidgetItem(groupname)
@@ -320,6 +347,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableWidget_group.setItem(RowCount,1,newItem2)
         # 按账户名首字母排序
         self.tableWidget_group.sortItems(0, QtCore.Qt.AscendingOrder)
+
+    def update_text_group1(self, name, owner):# 登录后更新群组列表
+        for i in range(0, len(name)):
+            if name != "":
+                RowCount = self.tableWidget_group.rowCount()
+                self.tableWidget_group.insertRow(RowCount)
+                newItem1 = QtWidgets.QTableWidgetItem(name[i])
+                newItem2 = QtWidgets.QTableWidgetItem(owner[i])
+                # 设置文本对齐方式
+                newItem1.setTextAlignment(QtCore.Qt.AlignCenter)
+                newItem2.setTextAlignment(QtCore.Qt.AlignCenter)
+                self.tableWidget_group.setItem(RowCount,0,newItem1)
+                self.tableWidget_group.setItem(RowCount,1,newItem2)
+                # 按账户名首字母排序
+                self.tableWidget_group.sortItems(0, QtCore.Qt.AscendingOrder)
 
     def slotAbout(self, message):  # 提示信息
         QtWidgets.QMessageBox.about(self,"About",self.tr(message))    
@@ -338,11 +380,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 class DealIn(QThread):
     # 信号
     sinIn_friendsalter = pyqtSignal(str,str)
-    sinIn_friends = pyqtSignal(list,list)
+    sinIn_friends = pyqtSignal(list, list)
     sinIn_textm = pyqtSignal(str)
     sinIn_text = pyqtSignal(str)
     sinIn_person = pyqtSignal(list)
     sinIn_group = pyqtSignal(str, str)
+    sinIn_updategroup = pyqtSignal(list, list)
     exception = pyqtSignal(str)
     exception1 = pyqtSignal(str)
     def booljson(self, data):# 判断是否为json
@@ -359,13 +402,16 @@ class DealIn(QThread):
             return False
     def run(self):
         while True:
-            # time.sleep(1)
             data = sock.recv(1024)
             if not data:
                 continue
             if self.boolutf8(data):
                 data = data.decode('utf-8')
             else:
+                continue
+            if data == 'groupnoexist':
+                print('群组不存在')
+                self.exception.emit('群组不存在')
                 continue
             if data == 'aleardybefriends':
                 print('你们已经是好友了')
@@ -380,48 +426,48 @@ class DealIn(QThread):
                 self.exception.emit('好友添加失败')
                 continue
             if data == 'noexist':
-                print('this person not exist')
-                self.exception.emit('this one not exist')
+                print('用户不存在')
+                self.exception.emit('用户不存在')
                 continue
             if data == 'outline':
-                print('this person outline')
-                self.exception.emit('this person outline')
+                print('用户不在线')
+                self.exception.emit('用户不在线')
                 continue
             if data == 'friendsFailed':
-                print('can not be friends')
-                self.exception.emit('can not be friends')
+                print('不能加好友')
+                self.exception.emit('不能成为好友')
                 continue
             if data == 'friendsSucceed':
-                print('add the friends successful')
+                print('添加好友成功')
                 self.exception.emit('添加好友成功')
                 continue
             if data == 'joinFailed':
-                print('do not exist the group')
-                self.exception.emit('do not exist the group')
+                print('群组不存在')
+                self.exception.emit('群组不存在')
                 continue
             if data == 'aleardyIn':
-                print('you are aleardy in the group')
-                self.exception.emit('you are aleardy in the group')
+                print('你已经在群里了')
+                self.exception.emit('你已经在群里了')
                 continue
             if data == 'joinSucceed':
-                print('join the group succeed')
-                self.exception.emit('join the group succeed')
+                print('加入群聊成功')
+                self.exception.emit('加入群聊成功')
                 continue
             if data == 'notInGroup':
-                print('you are not in the group')
-                self.exception.emit('you are not in the group')
+                print('你不在群聊中')
+                self.exception.emit('你不在群聊中')
                 continue
             if data == 'aleardyExist':
-                print('group aleardy exist')
-                self.exception.emit('group aleardy exist')
+                print('群组已经存在')
+                self.exception.emit('群组已经存在')
                 continue
             if data == 'creatSucceed':
-                print('creat the group succeed')
-                self.exception.emit('creat the group succeed')
+                print('创建群组成功')
+                self.exception.emit('创建群组成功')
                 continue
             if data == 'nofriends':
-                print('your target is not your friend')
-                self.exception.emit('your target is not your friend')
+                print('你发送的对象还不是你的好友')
+                self.exception.emit('你发送的对象还不是你的好友')
                 continue
             if data == '-1':
                 print('can not communication, not exist')
@@ -429,7 +475,7 @@ class DealIn(QThread):
                 continue
             if self.booljson(data):
                 data = json.loads(data)
-                if data["type"] == 'P2P':
+                if data["type"] == 'P2P':# 个人消息接受
                     if 'filename' in data.keys():# 图片
                         print('头文件接收完成')
                         filename = data['filename']
@@ -440,19 +486,22 @@ class DealIn(QThread):
                         f = open(path,'ab')
                         has_receive = 0
                         while has_receive != filesize:
-                            data = sock.recv(1024)
-                            f.write(data)
-                            has_receive += len(data)
+                            data1 = sock.recv(1024)
+                            f.write(data1)
+                            has_receive += len(data1)
                         print('客户端图片接收完成')
                         f.close()
+                        output = '{}->{} :(文件){}'.format(data['from'], data['to'], data['filename'])
+                        print (output)
+                        self.sinIn_text.emit(output)
                         self.exception.emit(filename+'图片接收成功')
                         continue
                     else:
-                        output = '{} ->{} :{}'.format(data['from'], data['to'], data['message'])
+                        output = '{}->{} :{}'.format(data['from'], data['to'], data['message'])
                         print (output)
                         self.sinIn_text.emit(output)
                         continue
-                if data["type"] == 'P2M':
+                if data["type"] == 'P2M':# 群组消息接受
                     if 'filename' in data.keys():# 图片
                         print('头文件接收完成')
                         filename = data['filename']
@@ -463,12 +512,15 @@ class DealIn(QThread):
                         f = open(path,'ab')
                         has_receive = 0
                         while has_receive != filesize:
-                            data = sock.recv(1024)
-                            f.write(data)
-                            has_receive += len(data)
+                            data1 = sock.recv(1024)
+                            f.write(data1)
+                            has_receive += len(data1)
                         print('客户端图片接收完成')
                         f.close()
                         self.exception.emit(filename+'图片接收成功')
+                        output = '{} ->group({}) :(文件){}'.format(data['from'], data['to'], data['filename'])
+                        print (output)
+                        self.sinIn_textm.emit(output)
                         continue
                     else:
                         output = '{} ->group({}) :{}'.format(data['from'], data['to'], data['message'])
@@ -499,6 +551,13 @@ class DealIn(QThread):
                     print ('groupname:',output1)
                     print ('owner:',output2)
                     self.sinIn_group.emit(output1, output2)
+                    continue
+                if data["type"] == 'updategroup':
+                    output1 = data['groupname']
+                    output2 = data['groupowner']
+                    print ('groupname:',output1)
+                    print ('owner:',output2)
+                    self.sinIn_updategroup.emit(output1, output2)
                     continue
                 if data["type"] == 'addfriends':
                     mess = data["owner"]

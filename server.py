@@ -40,11 +40,16 @@ class MyServer(socketserver.BaseRequestHandler):
         userIn = False
         # 登录注册部分
         while not userIn:
+            q = False# 判断是否在登录页面退出的标志位
             conn = self.request
             data = conn.recv(1024)
             if not data:
                 continue
-            dataobj = json.loads(data.decode('utf-8'))
+            try:
+                dataobj = json.loads(data.decode('utf-8'))
+            except:
+                q = True
+                break
             ret = ''
             if type(dataobj) == list:
                 optype = dataobj[0]
@@ -75,6 +80,17 @@ class MyServer(socketserver.BaseRequestHandler):
                         for person in connLst:
                             if person.boolonline == 1:
                                 person.conObj.sendall((json.dumps(data_person)).encode('utf-8'))
+                        time.sleep(0.3)
+                        # 更新群组
+                        group_name = []
+                        group_owner = []
+                        for obj in groupLst:
+                            group_name.append(obj.groupName)
+                            group_owner.append(obj.groupOwner_name)
+                        mess = {'type': 'updategroup', 'groupname': group_name, 'groupowner': group_owner}
+                        conn.sendall((json.dumps(mess)).encode('utf-8'))
+                        print('群组发送成功')
+
                         break
                 if optype == 'login':
                 # 登录
@@ -127,6 +143,8 @@ class MyServer(socketserver.BaseRequestHandler):
                                                 print(obj.friends)
                                                 print(obj.ownerObj)
                                                 print('通讯录发送成功')
+                                        # 有人上线，就把群列表发出去
+
 
                                         # 更新通讯录，给上线用户的好友发送新的通讯录
                                         for obj in friendsLst:
@@ -136,6 +154,18 @@ class MyServer(socketserver.BaseRequestHandler):
                                                         if s.account == i and s.boolonline == 1:
                                                             data_friends = {'type': 'friendalter', 'name':account, 'online':'1'}
                                                             s.conObj.sendall((json.dumps(data_friends)).encode('utf-8'))
+                                                            print('通讯录更新成功')
+                                        
+                                        # 更新群组
+                                        group_name = []
+                                        group_owner = []
+                                        for obj in groupLst:
+                                            group_name.append(obj.groupName)
+                                            group_owner.append(obj.groupOwner_name)
+                                        mess = {'type': 'updategroup', 'groupname': group_name, 'groupowner': group_owner}
+                                        conn.send((json.dumps(mess)).encode('utf-8'))
+                                        print('群组发送成功')
+
                         if ret == 'success':
                             break
                         if ret == '':
@@ -146,9 +176,7 @@ class MyServer(socketserver.BaseRequestHandler):
                         conn.sendall(data.encode('utf-8'))
 
         # 除登陆注册之外的请求的监听
-        while True:
-            # try:
-            # time.sleep(1)
+        while True and q == False:
             conn = self.request
             data = conn.recv(1024)
             if not data:
@@ -302,7 +330,8 @@ class MyServer(socketserver.BaseRequestHandler):
                     # 有新的群，就把群列表更新
                     data_group = {'type': 'groupList', 'name': groupName, 'owner': groupOwner_name}
                     for person in connLst:
-                        person.conObj.sendall((json.dumps(data_group)).encode('utf-8'))
+                        if person.boolonline == 1:
+                            person.conObj.sendall((json.dumps(data_group)).encode('utf-8'))
                 else:
                     conn.sendall(('aleardyExist').encode('utf-8'))
                 continue
@@ -345,42 +374,58 @@ class MyServer(socketserver.BaseRequestHandler):
                         print('服务器图片接收完成')
                         f.close()
                         # 转发图片
-                        for obj in groupLst:
-                            if obj.groupName == sendTo:
-                                if self.request in obj.members:# 如果发送者在群里
-                                    for user in obj.members:
-                                        if user != self.request:
-                                            # user.sendall(data)
-                                            filesize = os.stat(path).st_size
-                                            file_info = {'type': 'P2M', 'to':sendTo, 'filename': filename, 'filesize':filesize, 'from':sendFrom}
-                                            user.send((json.dumps(file_info)).encode('utf-8'))
-                                            f = open(path,'rb')
-                                            has_sent = 0
-                                            while has_sent != filesize:
-                                                data = f.read(1024)
-                                                user.sendall(data)
-                                                has_sent += len(data)
-                                            f.close()
-                                    print('转发成功')
-                                
-                                else:
-                                    mess = 'notInGroup'
-                                    print (mess)
-                                    conn.snedall(mess.encode('utf-8'))
+                        if dataobj['to'] in grouplist:
+                            for obj in groupLst:
+                                if obj.groupName == sendTo:
+                                    if self.request in obj.members:# 如果发送者在群里
+                                        for user in obj.members:
+                                            if user in connlist:
+                                                if user != self.request:
+                                                    # user.sendall(data)
+                                                    try:
+                                                        filesize = os.stat(path).st_size
+                                                        file_info = {'type': 'P2M', 'to':sendTo, 'filename': filename, 'filesize':filesize, 'from':sendFrom}
+                                                        user.send((json.dumps(file_info)).encode('utf-8'))
+                                                        f = open(path,'rb')
+                                                        has_sent = 0
+                                                        while has_sent != filesize:
+                                                            data = f.read(1024)
+                                                            user.sendall(data)
+                                                            has_sent += len(data)
+                                                        f.close()
+                                                    except:
+                                                        print('有人不在线')
+                                        print('转发成功')
+                                    
+                                    else:
+                                        mess = 'notInGroup'
+                                        print (mess)
+                                        conn.sendall(mess.encode('utf-8'))
+                        else:
+                            mess = 'groupnoexist'
+                            conn.sendall(mess.encode('utf-8'))
                         continue
                     else:
                         print('group',data)
                         sendFrom = dataobj['from']
-                        for obj in groupLst:
-                            if obj.groupName == dataobj['to']:
-                                if self.request in obj.members:# 如果发送者在群里
-                                    for user in obj.members:
-                                        if user != self.request:
-                                            user.sendall(data)
-                                else:
-                                    mess = 'notInGroup'
-                                    print (mess)
-                                    conn.snedall(mess.encode('utf-8'))
+                        if dataobj['to'] in grouplist:
+                            for obj in groupLst:
+                                if obj.groupName == dataobj['to']:
+                                    if self.request in obj.members:# 如果发送者在群里
+                                        for user in obj.members:
+                                                if user != self.request:
+                                                    try:
+                                                        user.sendall(data)
+                                                        print('发送成功')
+                                                    except:
+                                                        print('群里有人不在线')
+                                    else:
+                                        mess = 'notInGroup'
+                                        print (mess)
+                                        conn.sendall(mess.encode('utf-8'))
+                        else:
+                            mess = 'groupnoexist'
+                            conn.sendall(mess.encode('utf-8'))
                         continue
                 if dataobj["type"] == 'P2P':
                 # 个人信息发送
@@ -407,19 +452,23 @@ class MyServer(socketserver.BaseRequestHandler):
                                     s1 = 1 
                         for obj in connLst:
                             if dataobj['to'] == obj.account:
-                                if s1 == 1:
-                                    # obj.conObj.sendall(data)
-                                    filesize = os.stat(path).st_size
-                                    file_info = {'type': 'P2P', 'to':sendTo, 'filename': filename, 'filesize':filesize, 'from':sendFrom}
-                                    obj.conObj.send((json.dumps(file_info)).encode('utf-8'))
-                                    f = open(path,'rb')
-                                    has_sent = 0
-                                    while has_sent != filesize:
-                                        data = f.read(1024)
-                                        obj.conObj.sendall(data)
-                                        has_sent += len(data)
-                                    print('转发成功')
-                                    f.close()
+                                if obj.boolonline == 1:
+                                    if s1 == 1:
+                                        # obj.conObj.sendall(data)
+                                        filesize = os.stat(path).st_size
+                                        file_info = {'type': 'P2P', 'to':sendTo, 'filename': filename, 'filesize':filesize, 'from':sendFrom}
+                                        obj.conObj.send((json.dumps(file_info)).encode('utf-8'))
+                                        f = open(path,'rb')
+                                        has_sent = 0
+                                        while has_sent != filesize:
+                                            data = f.read(1024)
+                                            obj.conObj.sendall(data)
+                                            has_sent += len(data)
+                                        print('转发成功')
+                                        f.close()
+                                    else:
+                                        mess = 'outline'
+                                        conn.sendall(mess.encode('utf-8'))
                         if s1 == 0:
                             mess = 'nofriends'
                             print(mess)
@@ -436,8 +485,12 @@ class MyServer(socketserver.BaseRequestHandler):
                                     s1 = 1 
                         for obj in connLst:
                             if dataobj['to'] == obj.account:
-                                if s1 == 1:
-                                    obj.conObj.sendall(data)
+                                if obj.boolonline == 1:
+                                    if s1 == 1:
+                                        obj.conObj.sendall(data)
+                                else:
+                                    mess = 'outline'
+                                    conn.sendall(mess.encode('utf-8'))
                         if s1 == 0:
                             mess = 'nofriends'
                             print(mess)
