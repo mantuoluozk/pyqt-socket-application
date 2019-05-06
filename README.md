@@ -1,4 +1,4 @@
-# socket
+# pyqt-socket-简易微信
 
 ## server
 
