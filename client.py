@@ -260,7 +260,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def alter_friends_list(self, name, online):# 变更好友列表
         if online == '0':
-            newItem = QtWidgets.QTableWidgetItem("离线") 
+            newItem = QtWidgets.QTableWidgetItem("离线")
             self.slotAbout('您的好友' + name + '下线了')
         else:
             newItem = QtWidgets.QTableWidgetItem("在线")

@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(392, 594)
         MainWindow.setFixedSize(392, 594)
-        self.setWindowOpacity(0.9) # 设置窗口透明度
+        # self.setWindowOpacity(0.9) # 设置窗口透明度
         # self.setAttribute(QtCore.Qt.WA_TranslucentBackground) # 设置窗口背景透明
         # self.setWindowFlag(QtCore.Qt.FramelessWindowHint) # 隐藏边框
         self.setGeometry(300, 300, 300, 220)
