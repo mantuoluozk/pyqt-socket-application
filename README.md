@@ -11,11 +11,14 @@
 * 好友上下线通知
 * 私聊，群聊
 * 发送文字，图片
-> 因为没有使用数据库，所以每次服务器关闭后，所有信息都会消失
+> 因为没有使用数据库，所以每次服务器关闭后，所有信息都会消失 
+
+> server和client之间的数据传输是通过json传输的
 ## 界面
 * 注册登录界面 
 
-![登录页面](https://github.com/mantuoluozk/chinese_wordcloud_pyqt5/blob/master/resource/%E7%A8%8B%E5%BA%8F%E6%88%AA%E5%9B%BE.png)
-* 主界面 
+<img src="https://github.com/mantuoluozk/pyqt-socket-application/blob/master/src/login.png" width="300" height="500" alt="登录界面"/>
 
-![主页面](https://github.com/mantuoluozk/chinese_wordcloud_pyqt5/blob/master/resource/%E7%A8%8B%E5%BA%8F%E6%88%AA%E5%9B%BE.png)
+* 主界面
+
+<img src="https://github.com/mantuoluozk/pyqt-socket-application/blob/master/src/main.png" width="300" height="500" alt="主界面"/>
