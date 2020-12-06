@@ -1,5 +1,5 @@
 # pyqt-socket-简易微信
-
+高等计算机网络homework06709
 ## 使用
 
 先运行server.py,开启服务器(python server.py) 
